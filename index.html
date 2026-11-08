@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HTML ke Aplikasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--bg:#eef1f6;--surface:#fff;--ink:#14213d;--mute:#5b6784;--line:#d3d9e6;--accent:#ff7a1a;--accent-ink:#1a0d00;--field:#f7f9fc;--phone:#14213d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1424;--surface:#16203a;--ink:#eef1f8;--mute:#9aa6c4;--line:#2a3658;--field:#0f1830;--phone:#05080f}}
+:root[data-theme="dark"]{--bg:#0d1424;--surface:#16203a;--ink:#eef1f8;--mute:#9aa6c4;--line:#2a3658;--field:#0f1830;--phone:#05080f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 Figtree,system-ui,sans-serif}
+header{padding:32px 20px 8px;max-width:1120px;margin:0 auto}
+h1{font:800 clamp(30px,5vw,48px)/1.05 'Bricolage Grotesque',system-ui,sans-serif;margin:0 0 8px;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:56ch}
+main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;max-width:1120px;margin:0 auto;padding:20px}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+h2{font:700 18px/1.2 'Bricolage Grotesque',system-ui,sans-serif;margin:0 0 12px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input[type=text],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);font:inherit}
+textarea{min-height:260px;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+input[type=color]{width:100%;height:42px;border:1px solid var(--line);border-radius:8px;background:var(--field);padding:3px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{color:var(--mute);font-size:13px;margin:4px 0 0}
+button,.btn{font:600 15px Figtree,sans-serif;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:8px;padding:10px 14px;cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);width:100%;padding:14px;font-size:16px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.iconrow{display:flex;gap:16px;align-items:center}
+#iconPrev{width:72px;height:72px;border-radius:16px;border:1px solid var(--line);flex:none}
+.side{position:sticky;top:12px;align-self:start}
+.phone{background:var(--phone);border-radius:36px;padding:12px;width:100%;max-width:300px;margin:0 auto}
+.screen{border-radius:26px;overflow:hidden;background:#fff;aspect-ratio:9/17;position:relative}
+.screen iframe{width:100%;height:100%;border:0;background:#fff}
+.tile{display:flex;align-items:center;gap:10px;margin:14px auto 0;max-width:300px;color:var(--mute);font-size:13px}
+.tile canvas{width:40px;height:40px;border-radius:10px}
+#msg{margin-top:10px;font-size:14px;color:var(--mute);min-height:22px}
+details{margin-top:8px}
+summary{cursor:pointer;font-weight:600}
+ol{padding-left:20px;margin:8px 0 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Ubah kode HTML jadi aplikasi mobile</h1>
+  <p>Tempel kode HTML-mu, pilih ikon, lalu unduh paket aplikasi yang bisa dipasang di layar utama ponsel.</p>
+</header>
+<main>
+  <div>
+    <section class="card">
+      <h2>1. Kode HTML</h2>
+      <textarea id="code" spellcheck="false" aria-label="Kode HTML"></textarea>
+      <p class="hint">Atau <label for="file" style="display:inline;margin:0;text-decoration:underline;cursor:pointer">pilih file .html</label><input id="file" type="file" accept=".html,.htm,text/html" hidden></p>
+    </section>
+    <section class="card">
+      <h2>2. Detail aplikasi</h2>
+      <div class="row">
+        <div><label for="name">Nama aplikasi</label><input id="name" type="text" value="Aplikasiku"></div>
+        <div><label for="short">Nama singkat</label><input id="short" type="text" value="Aplikasiku" maxlength="12"></div>
+      </div>
+      <div class="row">
+        <div><label for="theme">Warna tema</label><input id="theme" type="color" value="#14213d"></div>
+        <div><label for="disp">Tampilan</label>
+          <select id="disp"><option value="standalone">Layar penuh seperti aplikasi</option><option value="fullscreen">Fullscreen tanpa status bar</option><option value="minimal-ui">Dengan kontrol minimal</option></select></div>
+      </div>
+      <label for="orient">Orientasi</label>
+      <select id="orient"><option value="any">Bebas</option><option value="portrait">Potret</option><option value="landscape">Lanskap</option></select>
+    </section>
+    <section class="card">
+      <h2>3. Ikon</h2>
+      <div class="iconrow">
+        <canvas id="iconPrev" width="144" height="144" aria-label="Pratinjau ikon"></canvas>
+        <div>
+          <input id="icon" type="file" accept="image/*" aria-label="Pilih gambar ikon">
+          <p class="hint">PNG persegi minimal 512×512 paling bagus. Tanpa gambar, ikon dibuat dari huruf pertama nama aplikasi.</p>
+        </div>
+      </div>
+      <label for="iconbg">Warna latar ikon</label>
+      <input id="iconbg" type="color" value="#ff7a1a">
+    </section>
+    <section class="card">
+      <h2>4. Buat paketnya</h2>
+      <button class="primary" id="go">Unduh paket aplikasi (.zip)</button>
+      <div id="msg" role="status"></div>
+      <details>
+        <summary>Cara memasang ke ponsel</summary>
+        <ol>
+          <li>Ekstrak ZIP, lalu unggah semua isinya ke hosting HTTPS (Netlify, GitHub Pages, Vercel, dsb.).</li>
+          <li>Buka alamatnya di Chrome Android, ketuk menu ⋮, lalu <b>Instal aplikasi</b>. Di iPhone: Safari, Bagikan, <b>Tambah ke Layar Utama</b>.</li>
+          <li>Untuk file APK, masukkan alamat situsmu ke pwabuilder.com dan pilih Android.</li>
+        </ol>
+      </details>
+    </section>
+  </div>
+  <aside class="side">
+    <div class="phone"><div class="screen"><iframe id="pv" title="Pratinjau aplikasi" sandbox="allow-scripts allow-forms allow-modals"></iframe></div></div>
+    <div class="tile"><canvas id="tile" width="80" height="80"></canvas><span id="tileName">Aplikasiku</span></div>
+  </aside>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const SAMPLE='<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Aplikasiku</title>\n<style>\nbody{font-family:sans-serif;margin:0;padding:24px;background:#fff7ed;color:#1c1917}\nbutton{padding:12px 18px;border:0;border-radius:10px;background:#ff7a1a;font-size:16px}\n</style>\n</head>\n<body>\n<h1>Halo dunia</h1>\n<p>Ini aplikasi buatanku.</p>\n<button onclick="this.textContent=\'Diketuk \'+(++window.n||(window.n=1))+\'x\'">Ketuk aku</button>\n</body>\n</html>';
+$('code').value=SAMPLE;
+let iconImg=null;
+
+function drawIcon(size,maskable){
+  const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');
+  x.fillStyle=$('iconbg').value;x.fillRect(0,0,size,size);
+  if(iconImg){
+    const pad=size*(maskable?.2:.06),box=size-pad*2,r=Math.min(box/iconImg.width,box/iconImg.height);
+    const w=iconImg.width*r,h=iconImg.height*r;x.drawImage(iconImg,(size-w)/2,(size-h)/2,w,h);
+  }else{
+    x.fillStyle='#fff';x.font='800 '+size*.55+'px Bricolage Grotesque,system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';
+    x.fillText(($('name').value.trim()[0]||'A').toUpperCase(),size/2,size*.54);
+  }
+  return c;
+}
+function refreshIcon(){
+  for(const [id,s,rad] of [['iconPrev',144,.22],['tile',80,.22]]){
+    const t=$(id),g=t.getContext('2d');g.clearRect(0,0,s,s);g.save();g.beginPath();g.roundRect(0,0,s,s,s*rad);g.clip();g.drawImage(drawIcon(s,false),0,0);g.restore();
+  }
+  $('tileName').textContent=$('short').value||$('name').value;
+}
+let t1;function refreshPv(){clearTimeout(t1);t1=setTimeout(()=>{$('pv').srcdoc=$('code').value},300)}
+$('code').addEventListener('input',refreshPv);
+['name','short','iconbg'].forEach(i=>$(i).addEventListener('input',refreshIcon));
+$('icon').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const im=new Image();
+  im.onload=()=>{iconImg=im;refreshIcon()};im.onerror=()=>{$('msg').textContent='Gambar ikon tidak bisa dibaca. Coba file PNG atau JPG.'};
+  im.src=URL.createObjectURL(f);
+});
+$('file').addEventListener('change',async e=>{const f=e.target.files[0];if(f){$('code').value=await f.text();refreshPv()}});
+
+function inject(html,tags){
+  if(!/<meta[^>]+name=["']viewport/i.test(html))tags='<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'+tags;
+  if(/<head[^>]*>/i.test(html))return html.replace(/<head[^>]*>/i,m=>m+tags);
+  if(/<html[^>]*>/i.test(html))return html.replace(/<html[^>]*>/i,m=>m+'<head><meta charset="utf-8">'+tags+'</head>');
+  return '<!DOCTYPE html><html lang="id"><head><meta charset="utf-8">'+tags+'<title>'+$('name').value+'</title></head><body>'+html+'</body></html>';
+}
+const blob=(c)=>new Promise(r=>c.toBlob(r,'image/png'));
+
+$('go').addEventListener('click',async()=>{
+  const msg=$('msg');
+  if(!$('code').value.trim()){msg.textContent='Isi kode HTML dulu sebelum membuat paket.';return}
+  if(typeof JSZip==='undefined'){msg.textContent='Pustaka ZIP gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.';return}
+  msg.textContent='Membuat paket…';
+  try{
+    const name=$('name').value.trim()||'Aplikasi',short=$('short').value.trim()||name,theme=$('theme').value;
+    const manifest={name,short_name:short,start_url:'./index.html',scope:'./',display:$('disp').value,orientation:$('orient').value,background_color:theme,theme_color:theme,lang:'id',
+      icons:[{src:'icons/icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},{src:'icons/icon-512.png',sizes:'512x512',type:'image/png',purpose:'any'},{src:'icons/maskable-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}]};
+    const tags='<link rel="manifest" href="manifest.json"><meta name="theme-color" content="'+theme+'"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="'+short.replace(/"/g,'&quot;')+'"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><link rel="icon" href="icons/icon-192.png"><script>if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("sw.js")})<\/script>';
+    const sw="const C='app-v1',F=['./','index.html','manifest.json','icons/icon-192.png','icons/icon-512.png'];\nself.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F))));\nself.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==C).map(n=>caches.delete(n))))));\nself.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('index.html'))))});\n";
+    const z=new JSZip();
+    z.file('index.html',inject($('code').value,tags));
+    z.file('manifest.json',JSON.stringify(manifest,null,2));
+    z.file('sw.js',sw);
+    const ic=z.folder('icons');
+    ic.file('icon-192.png',await blob(drawIcon(192,false)));
+    ic.file('icon-512.png',await blob(drawIcon(512,false)));
+    ic.file('maskable-512.png',await blob(drawIcon(512,true)));
+    ic.file('apple-touch-icon.png',await blob(drawIcon(180,false)));
+    z.file('BACA-SAYA.txt','Unggah semua file di folder ini ke hosting HTTPS, lalu buka situsnya di ponsel dan pilih "Instal aplikasi" / "Tambah ke Layar Utama".\nUntuk APK Android, gunakan pwabuilder.com dengan alamat situsmu.\n');
+    const out=await z.generateAsync({type:'blob'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(out);a.download=short.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-app.zip';document.body.appendChild(a);a.click();a.remove();
+    msg.textContent='Paket sudah diunduh. Unggah isinya ke hosting HTTPS untuk memasangnya.';
+  }catch(err){msg.textContent='Gagal membuat paket: '+err.message}
+});
+refreshIcon();refreshPv();
+</script>
+</body>
+</html>
